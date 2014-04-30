@@ -1451,7 +1451,7 @@ public:
         obj.push_back(Pair("isscript", false));
         if (mine == MINE_SPENDABLE) {
             pwalletMain->GetPubKey(keyID, vchPubKey);
-            obj.push_back(Pair("pubkey", HexStr(vchPubKey)));
+            obj.push_back(Pair("pubkey", HexStr(vchPubKey.Raw()))); // Quark needs vchPubKey.Raw vs vchPubKey for other coins
             obj.push_back(Pair("iscompressed", vchPubKey.IsCompressed()));
         }
         return obj;
@@ -1461,20 +1461,19 @@ public:
         Object obj;
         obj.push_back(Pair("isscript", true));
         if (mine == MINE_SPENDABLE) {
-             CScript subscript;
-             pwalletMain->GetCScript(scriptID, subscript);
-             std::vector<CTxDestination> addresses;
-             txnouttype whichType;
-             int nRequired;
-             ExtractDestinations(subscript, whichType, addresses, nRequired);
-             obj.push_back(Pair("script", GetTxnOutputType(whichType)));
-             obj.push_back(Pair("hex", HexStr(subscript.begin(), subscript.end())));
-             Array a;
-             BOOST_FOREACH(const CTxDestination& addr, addresses)
-                 a.push_back(CBitcoinAddress(addr).ToString());
-             obj.push_back(Pair("addresses", a));
-             if (whichType == TX_MULTISIG)
-                 obj.push_back(Pair("sigsrequired", nRequired));
+            CScript subscript;
+            pwalletMain->GetCScript(scriptID, subscript);
+            std::vector<CTxDestination> addresses;
+            txnouttype whichType;
+            int nRequired;
+            ExtractDestinations(subscript, whichType, addresses, nRequired);
+            obj.push_back(Pair("script", GetTxnOutputType(whichType)));
+            Array a;
+            BOOST_FOREACH(const CTxDestination& addr, addresses)
+                a.push_back(CBitcoinAddress(addr).ToString());
+            obj.push_back(Pair("addresses", a));
+            if (whichType == TX_MULTISIG)
+                obj.push_back(Pair("sigsrequired", nRequired));
         }
         return obj;
     }
@@ -1497,12 +1496,8 @@ Value validateaddress(const Array& params, bool fHelp)
         CTxDestination dest = address.Get();
         string currentAddress = address.ToString();
         ret.push_back(Pair("address", currentAddress));
-        //bool fMine = IsMine(*pwalletMain, dest);
-        //ret.push_back(Pair("ismine", fMine));
-        //if (fMine) {
-        //    Object detail = boost::apply_visitor(DescribeAddressVisitor(), dest);
-        //isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : MINE_NO; // maybe..
-        isminetype mine = IsMine(*pwalletMain, dest) : MINE_NO;
+        // isminetype mine = IsMine(*pwalletMain, dest) : MINE_NO; // hrm...
+        isminetype mine = pwalletMain ? IsMine(*pwalletMain, dest) : MINE_NO; 
         ret.push_back(Pair("ismine", mine != MINE_NO));
         if (mine != MINE_NO) {
             ret.push_back(Pair("watchonly", mine == MINE_WATCH_ONLY));

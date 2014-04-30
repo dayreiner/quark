@@ -89,20 +89,17 @@ bool CWallet::AddWatchOnly(const CTxDestination &dest)
 {
     if (!CCryptoKeyStore::AddWatchOnly(dest))
         return false;
-    nTimeFirstKey = 1; // No birthday information for watch-only keys.
+     // Unsupported in Quark
+    //nTimeFirstKey = 1; // No birthday information for watch-only keys.
     if (!fFileBacked)
         return true;
     return CWalletDB(strWalletFile).WriteWatchOnly(dest);
 }
 
-bool CWallet::AddWatchOnly(const CTxDestination &dest)
+bool CWallet::LoadWatchOnly(const CTxDestination &dest)
 {
-    if (!CCryptoKeyStore::AddWatchOnly(dest))
-        return false;
-    nTimeFirstKey = 1; // No birthday information for watch-only keys.
-    if (!fFileBacked)
-        return true;
-    return CWalletDB(strWalletFile).WriteWatchOnly(dest);
+    printf("Loaded %s!\n", CBitcoinAddress(dest).ToString().c_str());
+    return CCryptoKeyStore::AddWatchOnly(dest);
 }
 
 bool CWallet::Unlock(const SecureString& strWalletPassphrase)

@@ -1,3 +1,10 @@
+Quarkcoin-watchonly
+===================
+
+This fork of quarkd incorporates "watch only" addresses, allowing the import of public QRK addresses without also having the private key.
+
+The primary practical use for this quarkd fork is to facilitate zerotrust quarkcoin web wallet projects like [Quarkpunk](https://github.com/dayreiner/quarkpunk).
+
 Quarkcoin 0.8.3 BETA
 ====================
 

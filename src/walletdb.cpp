@@ -271,7 +271,8 @@ ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue,
 
             // Watch-only addresses have no birthday information for now,
             // so set the wallet birthday to the beginning of time.
-            pwallet->nTimeFirstKey = 1;
+            // Unsupported in Quark.
+            //pwallet->nTimeFirstKey = 1;
         }
         else if (strType == "key" || strType == "wkey")
         {
